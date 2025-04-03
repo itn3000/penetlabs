@@ -21,12 +21,13 @@ void ReadFile(string filePath)
         {
             OutputResource(peFile.ImageResourceDirectory, 0);
         }
+        
     }
 }
 
 void OutputResource(ImageResourceDirectory imageResourceDirectory, int depth)
 {
-    var indent = new string(' ', depth * 2);
+    var indent = new string(' ', depth * 4);
     Console.WriteLine($"{indent}major = {imageResourceDirectory.MajorVersion}, minor = {imageResourceDirectory.MinorVersion},char = {imageResourceDirectory.Characteristics:x}, idnum = {imageResourceDirectory.NumberOfIdEntries}");
     if(imageResourceDirectory.DirectoryEntries == null)
     {
@@ -40,7 +41,11 @@ void OutputResource(ImageResourceDirectory imageResourceDirectory, int depth)
             continue;
         }
         Console.WriteLine($"{indent}name = {item.Name},resolved = {item.NameResolved}, id = {item.ID}, offset = {item.OffsetToData}({item.OffsetToData:x}), isdir = {item.DataIsDirectory}, isId = {item.IsIdEntry}, isNamed = {item.IsNamedEntry}");
-        if(item.ResourceDirectory != null)
+        if (item.ResourceDataEntry != null)
+        {
+            Console.WriteLine($"{indent}dataentry: offset = {item.ResourceDataEntry.OffsetToData}({item.ResourceDataEntry.OffsetToData:x}),cp = {item.ResourceDataEntry.CodePage},size1 = {item.ResourceDataEntry.Size1}");
+        }
+        if (item.ResourceDirectory != null)
         {
             OutputResource(item.ResourceDirectory, depth + 1);
         }
