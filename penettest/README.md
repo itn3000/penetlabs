@@ -1,0 +1,1 @@
+﻿* https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#the-rsrc-section

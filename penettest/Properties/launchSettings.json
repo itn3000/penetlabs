@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "penettest": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\artifacts\\x64\\Debug\\nativeapp1.exe",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
