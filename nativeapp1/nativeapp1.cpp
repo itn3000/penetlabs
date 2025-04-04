@@ -2,10 +2,12 @@
 //
 
 #include <iostream>
+#include <Windows.h>
 
 int main()
 {
     std::cout << "Hello World!\n";
+    
 }
 
 // プログラムの実行: Ctrl + F5 または [デバッグ] > [デバッグなしで開始] メニュー

@@ -1,0 +1,17 @@
+﻿BeginUpdateResource
+EndUpdateResource
+FindResourceEx
+LoadLibrary
+HRSRC
+GetLocaleInfoEx
+LoadResource
+LOCALE_NAME_INVARIANT
+LOCALE_NAME_SYSTEM_DEFAULT
+LOCALE_RETURN_NUMBER
+LOCALE_SNAME
+LOCALE_ILANGUAGE
+LockResource
+SizeofResource
+EnumResourceNames
+EnumResourceTypes
+RT_STRING

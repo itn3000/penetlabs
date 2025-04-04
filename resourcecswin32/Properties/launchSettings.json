@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "resourcecswin32": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\artifacts\\x64\\$(Configuration)\\nativeapp1.exe",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
