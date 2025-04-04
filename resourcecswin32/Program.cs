@@ -9,11 +9,12 @@ CsWin32Test(args[0]);
 
 void CsWin32Test(string fileName)
 {
-    using SafeHandle safeHandle = PInvoke.LoadLibrary(fileName);
+    using var safeHandle = PInvoke.LoadLibrary(fileName);
     PInvoke.EnumResourceTypes(safeHandle, new Windows.Win32.System.LibraryLoader.ENUMRESTYPEPROCW(EnumResourceTypes), 0);
     PInvoke.EnumResourceNames(safeHandle, "BINARY", new Windows.Win32.System.LibraryLoader.ENUMRESNAMEPROCW(EnumResources), IntPtr.Zero);
     char[] localeReturn = new char[16];
-    var ret = PInvoke.GetLocaleInfoEx(PInvoke.LOCALE_NAME_SYSTEM_DEFAULT, PInvoke.LOCALE_ILANGUAGE, localeReturn);
+    //var ret = PInvoke.GetLocaleInfoEx(PInvoke.LOCALE_NAME_SYSTEM_DEFAULT, PInvoke.LOCALE_ILANGUAGE, localeReturn);
+    var ret = PInvoke.GetLocaleInfoEx("ja-JP", PInvoke.LOCALE_ILANGUAGE, localeReturn);
     if (ret != 0)
     {
         var locid = ushort.Parse(localeReturn, System.Globalization.NumberStyles.HexNumber);
@@ -23,7 +24,7 @@ void CsWin32Test(string fileName)
             string resourceType = "BINARY";
             fixed (char* rtp = resourceType)
             {
-                var hrsrc = PInvoke.FindResourceEx((HMODULE)safeHandle.DangerousGetHandle(), new PCWSTR(rtp), MakeIntPcwstrResource(103), locid);
+                var hrsrc = PInvoke.FindResourceEx((HMODULE)safeHandle.DangerousGetHandle(), new PCWSTR(rtp), IntResourceHelper.MakeIntPcwstrResource(103), locid);
                 if (hrsrc == IntPtr.Zero)
                 {
                     var lasterr = Marshal.GetLastWin32Error();
@@ -50,58 +51,50 @@ void CsWin32Test(string fileName)
         var lasterr = Marshal.GetLastWin32Error();
         Console.WriteLine($"failed to getlocalinfo: {lasterr}");
     }
-    //PInvoke.FindResourceEx(safeHandle, "BINARY", "103", PInvoke.GetLocaleInfoEx("", );
     BOOL EnumResources(HMODULE hMODULE, PCWSTR lpType, PWSTR lpName, nint ptr)
     {
-        unsafe
-        {
-            var v = new IntPtr(lpName.Value);
-            if (IsIntResource(v))
-            {
-                Console.WriteLine($"res = {lpType}: {v}");
-            }
-            else
-            {
-                Console.WriteLine($"res = {lpType}: {lpName}");
-            }
-        }
+        Console.WriteLine($"res = {IntResourceHelper.GetResourceIdOrName(lpType)}: {IntResourceHelper.GetResourceIdOrName(lpName)}");
         return true;
     }
     BOOL EnumResourceTypes(HMODULE hModule, PWSTR typeName, nint lparam)
     {
-        unsafe
-        {
-            var v = new IntPtr(typeName.Value);
-            if (IsIntResource(v))
-            {
-                Console.WriteLine($"typeid = {v}");
-            }
-            else if (typeName != null)
-            {
-                Console.WriteLine($"typename = {typeName}");
-            }
-        }
+        Console.WriteLine($"typename = {IntResourceHelper.GetResourceIdOrName(typeName)}");
         return true;
-    }
-    bool IsIntResource(IntPtr ptr)
-    {
-        return (((UIntPtr.MaxValue) << 16) & (UIntPtr)ptr) == 0;
-    }
-    PWSTR MakeIntPwstrResource(IntPtr ptr)
-    {
-        return new PWSTR(ptr);
-    }
-    PCWSTR MakeIntPcwstrResource(IntPtr ptr)
-    {
-        unsafe
-        {
-            return new PCWSTR((char *)ptr);
-        }
     }
 }
 
 static class IntResourceHelper
 {
+    public static string GetResourceIdOrName(PWSTR lpName)
+    {
+        unsafe
+        {
+            var addr = new IntPtr(lpName.Value);
+            if(IsIntResource(addr))
+            {
+                return addr.ToString();
+            }
+            else
+            {
+                return new string(lpName.AsSpan());
+            }
+        }
+    }
+    public static string GetResourceIdOrName(PCWSTR lpName)
+    {
+        unsafe
+        {
+            var addr = new IntPtr(lpName.Value);
+            if (IsIntResource(addr))
+            {
+                return addr.ToString();
+            }
+            else
+            {
+                return new string(lpName.AsSpan());
+            }
+        }
+    }
     public static bool IsIntResource(IntPtr ptr)
     {
         return IsIntResource((UIntPtr)ptr);
